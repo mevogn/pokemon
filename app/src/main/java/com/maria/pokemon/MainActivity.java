@@ -14,8 +14,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -23,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     private MenuItem item;
     private String url = "http://pokeapi.co/api/v2/evolution-chain/1/";
-    EditText rspText;
+    TextView  rspText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        rspText = (EditText) findViewById(R.id.showOutput);
+        rspText = (TextView) findViewById(R.id.showOutput);
         Button getButton = (Button) findViewById(R.id.sendGet);
         getButton.setOnClickListener(new View.OnClickListener() {
 
@@ -106,13 +108,18 @@ public class MainActivity extends AppCompatActivity {
             HttpURLConnection con = (HttpURLConnection) ( new URL(url)).openConnection();
             con.setRequestMethod("GET");
             con.connect();
-            con.getOutputStream().write( ("name=" + name).getBytes());
+            int respCode = con.getResponseCode();
 
-            InputStream is = con.getInputStream();
-            byte[] b = new byte[1024];
+            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String line = "";
+            StringBuilder responseOutput = new StringBuilder();
+            System.out.println("output===============" + br);
+            while((line = br.readLine()) != null ) {
+                responseOutput.append(line);
+            }
+            br.close();
 
-            while ( is.read(b) != -1)
-                buffer.append(new String(b));
+            rspText.append(System.getProperty("line.separator") + "Response " + System.getProperty("line.separator") + System.getProperty("line.separator") + responseOutput.toString());
 
             con.disconnect();
         }
