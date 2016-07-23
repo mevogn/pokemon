@@ -6,17 +6,17 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.util.JsonReader;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
+
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -24,7 +24,7 @@ import java.net.URL;
 public class MainActivity extends AppCompatActivity {
 
     private MenuItem item;
-    private String url = "http://pokeapi.co/api/v2/evolution-chain/1/";
+    private String url = "http://pokeapi.co/api/v2/berry/1/";
     TextView  rspText;
 
     @Override
@@ -110,16 +110,18 @@ public class MainActivity extends AppCompatActivity {
             con.connect();
             int respCode = con.getResponseCode();
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String line = "";
-            StringBuilder responseOutput = new StringBuilder();
-            System.out.println("output===============" + br);
-            while((line = br.readLine()) != null ) {
-                responseOutput.append(line);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
+            String jsonLine = bufferedReader.readLine();
+            if (jsonLine != null) {
+                JSONObject jsonObject = new JSONObject(jsonLine);
+                jsonObject.has("id");
             }
-            br.close();
 
-            rspText.append(System.getProperty("line.separator") + "Response " + System.getProperty("line.separator") + System.getProperty("line.separator") + responseOutput.toString());
+//            try {
+//                ReadMessagesArray(bufferedReader);
+//            } finally {
+//                bufferedReader.close();
+//            }
 
             con.disconnect();
         }
@@ -128,5 +130,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return buffer.toString();
+    }
+
+    private void ReadMessagesArray(BufferedReader bufferedReader) throws IOException {
+       // jsonReader.beginArray();
+//        while(bufferedReader.hasNext()) {
+//            String name = bufferedReader.nextName();
+//            if (name.equals("id")) {
+//                System.out.println(bufferedReader.nextLong());
+//            } else if (name.equals("name")) {
+//                rspText.append(bufferedReader.nextString());
+//            }
+//        }
     }
 }
